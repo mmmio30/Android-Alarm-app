@@ -12,13 +12,22 @@ Android アラームアプリの要件定義ドキュメント。
 | 06 | [06-open-questions.md](06-open-questions.md) | **未決事項 / 要判断リスト（← まずここに回答がほしい）** |
 | 07 | [07-decision-log.md](07-decision-log.md) | 決定ログ（確定事項と仮決定） |
 | 08 | [08-scope-and-roadmap.md](08-scope-and-roadmap.md) | MVP 範囲とフェーズ分け |
+| 09 | [09-play-release.md](09-play-release.md) | Google Play 公開に必要な作業と審査上の論点 |
 
 ## 進め方
 
-1. `06-open-questions.md` の Q1〜Q3 に回答 → 設計の骨格が確定
-2. `08-scope-and-roadmap.md` で MVP 範囲を合意
-3. 確定した内容を `07-decision-log.md` に転記
-4. 実装着手（フェーズ 0 から）
+**要件 → 設計 → 実装**の順で進める（D-012）。配布は Google Play 公開（D-007）。
+
+1. ~~配布方針・グループ仕様の決定~~ → 完了（D-007 〜 D-012）
+2. `06-open-questions.md` の残り（Q6〜Q20）に回答
+3. `08-scope-and-roadmap.md` で MVP 範囲を合意
+4. 設計フェーズ（画面設計 / データ設計 / アーキテクチャ / ロジック仕様）
+5. 実装着手
+
+## 現在の状況
+
+- フェーズ A（要件確定）を進行中
+- 確定事項 12 件（D-001 〜 D-012） / 仮決定 13 件 / 未決 15 件
 
 ## ステータス表記
 
