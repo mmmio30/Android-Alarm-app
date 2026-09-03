@@ -155,12 +155,13 @@ fun willRing(alarm: Alarm, date: LocalDate): Boolean {
   if (matchesExcludeRule(scope = GROUP, date)) return false
   if (matchesExcludeRule(scope = ALARM, date)) return false
 
-  // --- ステップ 6: 祝日（内蔵データ + ユーザー編集を反映。3.6 参照） ---
+  // --- ステップ 6: 予約日（INCLUDE）。祝日判定より先に評価する ---
+  //     ユーザーが日付を名指しした指定は、祝日の自動 OFF より強い。
+  if (matchesIncludeRule(alarm, date)) return true
+
+  // --- ステップ 7: 祝日（内蔵データ + ユーザー編集を反映。3.6 参照） ---
   if (effectiveHolidayBehavior(alarm) == SKIP_HOLIDAY
       && holidayCalendar.isHoliday(date)) return false
-
-  // --- ステップ 7: 予約日（INCLUDE）は曜日条件を上書きして鳴らす ---
-  if (matchesIncludeRule(alarm, date)) return true
 
   // --- ステップ 8: 通常の繰り返し条件 ---
   return if (alarm.repeatDays.isEmpty()) {
@@ -180,17 +181,22 @@ fun willRing(alarm: Alarm, date: LocalDate): Boolean {
 | 3 | 当日スキップ | 鳴らない |
 | 4 | **手動解決済みの衝突（DateOverride）** | **その決定に従う** |
 | 5 | 除外日（APP / GROUP / ALARM のいずれか） | 鳴らない |
-| 6 | 祝日（祝日 OFF 設定時） | 鳴らない |
-| 7 | 予約日（INCLUDE） | **鳴る** |
+| 6 | 予約日（INCLUDE） | **鳴る** |
+| 7 | 祝日（祝日 OFF 設定時） | 鳴らない |
 | 8 | 曜日繰り返し条件 | 条件次第 |
+
+**「明示的な指定」が「自動ルール」より強い、が原則。**
+除外日と予約日はユーザーが日付を名指しした指定なので、祝日の自動 OFF より優先する。
+たとえば「祝日は鳴らさない」グループでも、その祝日に予約日を入れれば鳴る。
+除外日と予約日は同じ強さなので衝突しうる → D-015 の警告で解決する。
 
 ### 除外日と予約日の衝突の扱い（D-015）
 
 **原則**: 登録時に衝突を検出してユーザーに選ばせ、その答えを `DateOverride` に保存する（ステップ 4）。
 
 **未解決のまま残った衝突**（毎年繰り返す除外日の翌年分、インポート、後から足した上位階層の除外日など）は、
-ステップ 5 がステップ 7 より先に評価されるため **自動的に「鳴らない（除外優先）」** になる。
-これを反転したい場合は、アプリ設定でステップ 7 をステップ 5 の前に評価するよう切り替える（FR-4.5.8）。
+ステップ 5 がステップ 6 より先に評価されるため **自動的に「鳴らない（除外優先）」** になる。
+これを反転したい場合は、アプリ設定でステップ 5 と 6 の評価順を入れ替える（FR-4.5.8）。
 
 未解決の衝突は実効スケジュールのプレビューで警告表示する（FR-4.5.7）。**黙って鳴らさないことは避ける。**
 
