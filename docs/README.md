@@ -14,6 +14,12 @@ Android アラームアプリの要件定義ドキュメント。
 | 08 | [08-scope-and-roadmap.md](08-scope-and-roadmap.md) | MVP 範囲とフェーズ分け |
 | 09 | [09-play-release.md](09-play-release.md) | Google Play 公開に必要な作業と審査上の論点 |
 
+### 設計（フェーズ B）
+
+| # | ファイル | 内容 |
+|---|---|---|
+| 10 | [10-screen-design.md](10-screen-design.md) | 画面一覧・遷移・ワイヤーフレーム・操作仕様 |
+
 ## 進め方
 
 **要件 → 設計 → 実装**の順で進める（D-012）。配布は Google Play 公開（D-007）。
