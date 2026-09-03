@@ -22,6 +22,7 @@ Android アラームアプリの要件定義ドキュメント。
 | 11 | [11-data-design.md](11-data-design.md) | Room のテーブル定義・インデックス・マイグレーション方針 |
 | 12 | [12-architecture.md](12-architecture.md) | レイヤ構成・主要クラス・鳴動シーケンス・テスト構成 |
 | 13 | [13-logic-spec.md](13-logic-spec.md) | **判定ロジックの確定仕様とテストケース一覧（実装完了の定義）** |
+| 14 | [14-play-console-setup.md](14-play-console-setup.md) | **Play Console 申請の進め方（12人×14日の要件と分担）** |
 
 ## 進め方
 

@@ -119,6 +119,7 @@ enum class SkipReason {
 | クラス | 責務 |
 |---|---|
 | `AlarmScheduler` | **再計算とアラーム登録の唯一の入口**。`reschedule()` だけを公開する |
+| `AudioHardeningGuard` | Android 17 の音声制限（4.4b）に適合しているかを検査し、無音失敗を検出する |
 | `AlarmReceiver` | `AlarmManager` からの発火を受ける `BroadcastReceiver`。すぐ `RingService` を起動する |
 | `BootReceiver` | `BOOT_COMPLETED` / `MY_PACKAGE_REPLACED` / `TIMEZONE_CHANGED` / `TIME_SET` / `DATE_CHANGED` を受けて `reschedule()` |
 | `RingService` | フォアグラウンドサービス。音・バイブ・自動停止タイマーを保持する |
@@ -273,8 +274,9 @@ RingActivity (全画面)
 | 事象 | 挙動 |
 |---|---|
 | 音源ファイルが読めない | 端末既定のアラーム音にフォールバック（NFR-1.3）。**無音にしない** |
+| **音声が無言で失敗した**（Android 17 の音声制限 / 4.4b） | 再生開始後に実際に鳴っているかを検証し、鳴っていなければバイブ + 通知で異常を伝える。`requestAudioFocus()` の戻り値も必ずチェックする |
 | 既定音も読めない | 最終手段として端末のバイブのみで鳴動し、通知で異常を伝える |
-| 正確アラーム権限がない | `setAlarmClock` を試み、失敗したら不正確なアラームで代替登録し、**バナーで明示的に警告する** |
+| 正確アラーム権限がない | **代替登録はしない（D-026）**。Android 17 では音声再生自体が無言で失敗しうるため、「たぶん鳴る」状態を作らず、鳴らせないことを明確に警告する |
 | DB 読み込み失敗 | 起動時に検出し、エラー画面を出す。無言で「アラーム 0 件」にしない |
 | 発火時にアラームが既に削除済み | 何もせず再計算のみ行う |
 | 再計算中に例外 | ログを残し、日次メンテナンスで再試行する |
@@ -304,6 +306,7 @@ RingActivity (全画面)
 |---|---|---|
 | ユニット（純粋 Kotlin） | `RingDecider` / `NextRingCalculator` / `ConflictDetector` / `HolidayCalendar` / `BulkAlarmGenerator` | **最重点** |
 | ユニット（Robolectric） | `AlarmScheduler` の登録内容、通知の組み立て | 中 |
+| 実機（3 台） | 鳴動の確実性、Android 17 の音声制限、OEM 省電力（→ `04` の 4.7b） | **必須** |
 | 結合（androidTest） | Room の DAO とマイグレーション | 中 |
 | 手動 | 実機での鳴動（再起動後 / DND / 電池最適化 ON / 低電力モード） | 必須 |
 
@@ -312,6 +315,7 @@ RingActivity (全画面)
 - 「10 秒後に鳴らす」
 - 「任意の日付を指定して `willRing()` の結果と理由を見る」
 - 「現在 `AlarmManager` に登録されている時刻を表示する」
+- 「音声の実際の再生状態と `AudioHardening` の判定結果を表示する」（4.4b の検証用）
 
 ---
 
@@ -320,6 +324,7 @@ RingActivity (全画面)
 | # | 論点 | 備考 |
 |---|---|---|
 | A-1 | 同時刻に複数アラームがある場合の扱い | MVP は「まとめて 1 件」で進める |
-| A-2 | フォアグラウンドサービスの型（Q17） | 実装直前に Play Console を確認して決定 |
+| ~~A-2~~ | ~~フォアグラウンドサービスの型~~ | **解決: `mediaPlayback`（D-025 / 4.4b）** |
 | A-3 | `RingService` と `RingActivity` の役割分担 | 音の保持は Service、表示は Activity で確定。停止操作の受け口をどちらにするか要検討 |
-| A-4 | 権限が無い状態での「不正確なアラーム」フォールバックを実装するか | 中途半端に鳴るより、明確に警告するだけの方が良い可能性もある |
+| ~~A-4~~ | ~~権限が無い状態での不正確なアラームへのフォールバック~~ | **解決: 実装しない（D-026）** |
+| A-5 | 音声の無言失敗をどう検知するか | 再生開始後の実測、`AudioHardeningGuard` の実装方法。フェーズ C で実機検証しながら決める |
