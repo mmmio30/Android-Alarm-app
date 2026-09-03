@@ -19,6 +19,8 @@ Android アラームアプリの要件定義ドキュメント。
 | # | ファイル | 内容 |
 |---|---|---|
 | 10 | [10-screen-design.md](10-screen-design.md) | 画面一覧・遷移・ワイヤーフレーム・操作仕様 |
+| 11 | [11-data-design.md](11-data-design.md) | Room のテーブル定義・インデックス・マイグレーション方針 |
+| 12 | [12-architecture.md](12-architecture.md) | レイヤ構成・主要クラス・鳴動シーケンス・テスト構成 |
 
 ## 進め方
 
